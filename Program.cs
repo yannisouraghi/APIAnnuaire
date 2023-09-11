@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using APIAnnuaire.Models;
+
 
 namespace APIAnnuaire
 {
@@ -13,9 +16,12 @@ namespace APIAnnuaire
 
             // Add services to the container.
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<APIDbContext>(options =>
+                options.UseMySql("Server=localhost;Database=annuaire;User=root;Password=adm;Port=3306;",
+                    new MariaDbServerVersion(new Version(11, 1, 2))));
 
             var app = builder.Build();
 
@@ -28,9 +34,6 @@ namespace APIAnnuaire
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
                 });
             }
-
-            string xmlFilePath = "EmployeeData.xml";
-            EmployeeData.LoadDataFromXml(xmlFilePath);
 
             app.UseHttpsRedirection();
 

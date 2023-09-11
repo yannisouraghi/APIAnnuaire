@@ -1,35 +1,29 @@
 ﻿using APIAnnuaire.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace APIAnnuaire
 {
+    public class EmployeeContext : DbContext
+    {
+        public DbSet<Employee> Employees { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseMySql("Server=localhost;Database=annuaire;User=root;Password=adm;Port=3306;",
+                new MariaDbServerVersion(new Version(11, 1, 2)));
+        }
+    }
+
     public static class EmployeeData
     {
-        public static List<Employee> LoadDataFromXml(string xmlFilePath)
+        public static List<Employee> LoadDataFromDatabase()
         {
-            XDocument xmlDoc = XDocument.Load(xmlFilePath);
-            List<Employee> employees = xmlDoc.Root.Elements("table")
-                .Where(table => table.Attribute("name")?.Value == "employees")
-                .Elements("row")
-                .Select(row => new Employee
-                {
-                    Id = int.Parse(row.Element("Id").Value),
-                    FirstName = row.Element("FirstName").Value,
-                    LastName = row.Element("LastName").Value,
-                    Department = row.Element("Department").Value,
-                    Email = row.Element("Email").Value,
-                    PhoneNumber = row.Element("PhoneNumber").Value,
-                    MobilePhone = row.Element("MobilePhone").Value,
-                    JobTitle = row.Element("JobTitle").Value,
-                    JobDescription = row.Element("JobDescription").Value,
-                    Service = row.Element("Service").Value,
-                    Site = row.Element("Site").Value
-                })
-                .ToList();
+            using var context = new EmployeeContext();
 
-            return employees;
+            return context.Employees.ToList();
         }
     }
 }
