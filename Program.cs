@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using APIAnnuaire.Models;
 
-
 namespace APIAnnuaire
 {
     public class Program
@@ -19,9 +18,9 @@ namespace APIAnnuaire
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Utilisez SQLite au lieu de MySQL
             builder.Services.AddDbContext<APIDbContext>(options =>
-                options.UseMySql("Server=localhost;Database=annuaire;User=root;Password=adm;Port=3306;",
-                    new MariaDbServerVersion(new Version(11, 1, 2))));
+                options.UseSqlite("Data Source=data.db")); // annuaire.db est le nom de votre base de données SQLite
 
             var app = builder.Build();
 

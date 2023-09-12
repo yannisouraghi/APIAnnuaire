@@ -11,9 +11,9 @@ namespace APIAnnuaire.Controllers
     [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
     {
-        private readonly EmployeeContext _context; // Utilisation du contexte de base de données
+        private readonly APIDbContext _context; // Utilisation du contexte de base de données
 
-        public EmployeeController(EmployeeContext context) // Injection du contexte de base de données via le constructeur
+        public EmployeeController(APIDbContext context) // Injection du contexte de base de données via le constructeur
         {
             _context = context;
         }
@@ -82,5 +82,36 @@ namespace APIAnnuaire.Controllers
 
             return employeesByLastName;
         }
+
+        [HttpGet("Search")]
+        public ActionResult<IEnumerable<Employee>> SearchEmployees(string name = null, string site = null, string service = null)
+        {
+            // Créez une requête de base pour tous les employés
+            var query = _context.Employees.AsQueryable();
+
+            // Ajoutez des filtres en fonction des critères de recherche fournis
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(e => EF.Functions.Like(e.LastName, $"%{name}%"));
+            }
+
+            if (!string.IsNullOrEmpty(site))
+            {
+                query = query.Where(e => EF.Functions.Like(e.Site, $"%{site}%"));
+            }
+
+            if (!string.IsNullOrEmpty(service))
+            {
+                query = query.Where(e => EF.Functions.Like(e.Service, $"%{service}%"));
+            }
+
+            // Exécutez la requête et renvoyez les résultats
+            var employees = query.ToList();
+
+            return employees;
+        }
+
+
+
     }
 }

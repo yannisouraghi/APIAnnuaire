@@ -1,29 +1,37 @@
 ﻿using APIAnnuaire.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace APIAnnuaire
 {
-    public class EmployeeContext : DbContext
-    {
-        public DbSet<Employee> Employees { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseMySql("Server=localhost;Database=annuaire;User=root;Password=adm;Port=3306;",
-                new MariaDbServerVersion(new Version(11, 1, 2)));
-        }
-    }
-
     public static class EmployeeData
     {
         public static List<Employee> LoadDataFromDatabase()
         {
-            using var context = new EmployeeContext();
+            var options = new DbContextOptionsBuilder<APIDbContext>()
+                .UseSqlite("Data Source=data.db") // Spécifiez le chemin de votre fichier SQLite
+                .Options;
 
+            using var context = new APIDbContext(options);
+
+            // Utilisez context.Employees pour accéder aux données de la table Employee.
             return context.Employees.ToList();
+        }
+
+        public static void SaveDataToDatabase(List<Employee> employees)
+        {
+            var options = new DbContextOptionsBuilder<APIDbContext>()
+                .UseSqlite("Data Source=data.db") // Spécifiez le chemin de votre fichier SQLite
+                .Options;
+
+            using var context = new APIDbContext(options);
+
+            // Supprimez les données existantes (facultatif) et ajoutez de nouvelles données.
+            context.Employees.RemoveRange(context.Employees);
+            context.Employees.AddRange(employees);
+
+            context.SaveChanges();
         }
     }
 }
