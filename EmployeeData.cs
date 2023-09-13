@@ -7,7 +7,7 @@ namespace APIAnnuaire
 {
     public static class EmployeeData
     {
-        public static List<Employee> LoadDataFromDatabase()
+        public static List<Employees> LoadDataFromDatabase()
         {
             var options = new DbContextOptionsBuilder<APIDbContext>()
                 .UseSqlite("Data Source=data.db") // Spécifiez le chemin de votre fichier SQLite
@@ -19,7 +19,7 @@ namespace APIAnnuaire
             return context.Employees.ToList();
         }
 
-        public static void SaveDataToDatabase(List<Employee> employees)
+        public static void SaveDataToDatabase(List<Employees> employees)
         {
             var options = new DbContextOptionsBuilder<APIDbContext>()
                 .UseSqlite("Data Source=data.db") // Spécifiez le chemin de votre fichier SQLite

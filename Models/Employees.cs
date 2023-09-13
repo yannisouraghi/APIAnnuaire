@@ -4,12 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace APIAnnuaire.Models
 {
-    public class Employee
+    public class Employees
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Auto-incrément
-        public int Id { get; set; }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int EmployeeId { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Department { get; set; }
@@ -18,7 +17,15 @@ namespace APIAnnuaire.Models
         public string? MobilePhone { get; set; }
         public string? JobTitle { get; set; }
         public string? JobDescription { get; set; }
-        public string? Service { get; set; }
-        public string? Site { get; set; }
+
+        // Clé étrangère pour Site
+        public int? SiteId { get; set; }
+        public Sites? Sites { get; set; }
+
+        // Clé étrangère pour Service
+        public int? ServiceId { get; set; }
+        public Services? Services { get; set; }
     }
+
+
 }

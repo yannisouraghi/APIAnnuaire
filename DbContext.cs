@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using APIAnnuaire.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace APIAnnuaire
 {
@@ -9,9 +10,9 @@ namespace APIAnnuaire
         {
         }
 
-        public DbSet<Employee> Employees { get; set; }
-        public DbSet<Site> Sites { get; set; }
-        public DbSet<Service> Services { get; set; }
+        public DbSet<Employees> Employees { get; set; }
+        public DbSet<Sites> Sites { get; set; }
+        public DbSet<Services> Services { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -24,7 +25,15 @@ namespace APIAnnuaire
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Vous pouvez ajouter ici des configurations spécifiques à vos modèles si nécessaire.
+            modelBuilder.Entity<Employees>()
+                .HasOne(e => e.Sites)
+                .WithMany()
+                .HasForeignKey(e => e.SiteId);
+
+            modelBuilder.Entity<Employees>()
+                .HasOne(e => e.Services)
+                .WithMany()
+                .HasForeignKey(e => e.ServiceId);
         }
     }
 }

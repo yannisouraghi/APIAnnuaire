@@ -1,8 +1,13 @@
-﻿namespace APIAnnuaire.Models
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace APIAnnuaire.Models
 {
-    public class Site
+    public class Sites
     {
-        public int Id { get; set; }
+        [Key]
+        public int SiteId { get; set; }
         public string? City { get; set; }
         public string? Address { get; set; }
         public string? Service { get; set; }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Ajout de cette référence
+using Microsoft.EntityFrameworkCore;
 using APIAnnuaire.Models;
 
 namespace APIAnnuaire.Controllers
@@ -19,57 +19,15 @@ namespace APIAnnuaire.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Employee>> Get()
+        public ActionResult<IEnumerable<Employees>> Get()
         {
             var employees = _context.Employees.ToList(); // Charger les employés depuis la base de données
 
             return employees;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Employee> Get(int id)
-        {
-            var employee = _context.Employees.FirstOrDefault(e => e.Id == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            return employee;
-        }
-
-        [HttpGet("site/{Site}")]
-        public ActionResult<List<Employee>> GetEmployeesBySite(string Site)
-        {
-            var employeesBySite = _context.Employees
-                .Where(e => e.Site.Equals(Site, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            if (employeesBySite.Count == 0)
-            {
-                return NotFound();
-            }
-
-            return employeesBySite;
-        }
-
-        [HttpGet("service/{Service}")]
-        public ActionResult<List<Employee>> GetEmployeesByService(string Service)
-        {
-            var employeesByService = _context.Employees
-                .Where(e => e.Service.Equals(Service, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            if (employeesByService.Count == 0)
-            {
-                return NotFound();
-            }
-
-            return employeesByService;
-        }
-
         [HttpGet("lastname/{LastName}")]
-        public ActionResult<List<Employee>> GetEmployeesByLastName(string LastName)
+        public ActionResult<List<Employees>> GetEmployeesByLastName(string LastName)
         {
             var employeesByLastName = _context.Employees
                 .Where(e => e.LastName.Equals(LastName, StringComparison.OrdinalIgnoreCase))
@@ -84,12 +42,10 @@ namespace APIAnnuaire.Controllers
         }
 
         [HttpGet("Search")]
-        public ActionResult<IEnumerable<Employee>> SearchEmployees(string name = null, string site = null, string service = null)
+        public ActionResult<IEnumerable<object>> SearchEmployees(string name = null, string site = null, string service = null)
         {
-            // Créez une requête de base pour tous les employés
             var query = _context.Employees.AsQueryable();
 
-            // Ajoutez des filtres en fonction des critères de recherche fournis
             if (!string.IsNullOrEmpty(name))
             {
                 query = query.Where(e => EF.Functions.Like(e.LastName, $"%{name}%"));
@@ -97,21 +53,32 @@ namespace APIAnnuaire.Controllers
 
             if (!string.IsNullOrEmpty(site))
             {
-                query = query.Where(e => EF.Functions.Like(e.Site, $"%{site}%"));
+                query = query.Where(e => EF.Functions.Like(e.Sites.City, $"%{site}%"));
             }
 
             if (!string.IsNullOrEmpty(service))
             {
-                query = query.Where(e => EF.Functions.Like(e.Service, $"%{service}%"));
+                query = query.Where(e => EF.Functions.Like(e.Services.Service, $"%{service}%"));
             }
 
-            // Exécutez la requête et renvoyez les résultats
-            var employees = query.ToList();
+            // Maintenant, vous pouvez exécuter la requête en utilisant ToList() ou une autre méthode de résultat.
+            var employees = query.Select(e => new
+            {
+                e.EmployeeId,
+                e.FirstName,
+                e.LastName,
+                e.Department,
+                e.Email,
+                e.PhoneNumber,
+                e.MobilePhone,
+                e.JobTitle,
+                e.JobDescription,
+                Services = e.Services != null ? e.Services.Service : null, // Remplacer ServiceId par Services
+                City = e.Sites != null ? e.Sites.City : null // Remplacer SiteId par City
+            }).ToList();
 
             return employees;
         }
-
-
 
     }
 }

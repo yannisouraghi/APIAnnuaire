@@ -3,6 +3,7 @@ using System;
 using APIAnnuaire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APIAnnuaire.Migrations
 {
     [DbContext(typeof(APIDbContext))]
-    partial class APIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230913085321_CleanStart")]
+    partial class CleanStart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
@@ -50,14 +53,20 @@ namespace APIAnnuaire.Migrations
                     b.Property<int?>("ServiceId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ServicesServiceId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("SiteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SitesSiteId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("EmployeeId");
 
-                    b.HasIndex("ServiceId");
+                    b.HasIndex("ServicesServiceId");
 
-                    b.HasIndex("SiteId");
+                    b.HasIndex("SitesSiteId");
 
                     b.ToTable("Employees");
                 });
@@ -106,11 +115,11 @@ namespace APIAnnuaire.Migrations
                 {
                     b.HasOne("APIAnnuaire.Models.Services", "Services")
                         .WithMany()
-                        .HasForeignKey("ServiceId");
+                        .HasForeignKey("ServicesServiceId");
 
                     b.HasOne("APIAnnuaire.Models.Sites", "Sites")
                         .WithMany()
-                        .HasForeignKey("SiteId");
+                        .HasForeignKey("SitesSiteId");
 
                     b.Navigation("Services");
 
