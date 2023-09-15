@@ -79,6 +79,62 @@ namespace APIAnnuaire.Controllers
 
             return employees;
         }
+        [HttpPost("FirstName/{FirstName}/LastName/{LastName}/Department/{Department}/Email/{Email}/PhoneNumber/{PhoneNumber}/MobilePhone/{MobilePhone}/JobTitle/{JobTitle}/JobDescription/{JobDescription}/Site/{Site}/Service/{Service}")]
+        public ActionResult InsertNewEmployee(
+            string FirstName,
+            string LastName,
+            string Department,
+            string Email,
+            string PhoneNumber,
+            string MobilePhone,
+            string JobTitle,
+            string JobDescription,
+            string Site,
+            string Service)
+        {
+            try
+            {
+                // Recherchez l'ID du Service dans la table Services
+                int? serviceId = _context.Services
+                    .Where(s => s.Service == Service)
+                    .Select(s => (int?)s.ServiceId)
+                    .FirstOrDefault();
 
+                // Recherchez l'ID du Site dans la table Sites
+                int? siteId = _context.Sites
+                    .Where(s => s.City == Site)
+                    .Select(s => (int?)s.SiteId)
+                    .FirstOrDefault();
+
+                // Créez un nouvel employé avec les IDs récupérés
+                Employees employee = new Employees
+                {
+                    FirstName = FirstName,
+                    LastName = LastName,
+                    Department = Department,
+                    Email = Email,
+                    PhoneNumber = PhoneNumber,
+                    MobilePhone = MobilePhone,
+                    JobTitle = JobTitle,
+                    JobDescription = JobDescription,
+                    ServiceId = serviceId,
+                    SiteId = siteId
+                };
+
+                // Ajoutez le nouvel employé à la table Employees
+                _context.Employees.Add(employee);
+
+                // Enregistrez les modifications dans la base de données
+                _context.SaveChanges();
+
+                // Renvoyez une réponse HTTP appropriée
+                return CreatedAtAction("InsertNewEmployee", new { id = employee.EmployeeId }, employee);
+            }
+            catch (Exception ex)
+            {
+                // Gérez les erreurs et renvoyez une réponse d'erreur appropriée si nécessaire
+                return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
+            }
+        }
     }
 }
